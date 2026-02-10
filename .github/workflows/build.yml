@@ -27,8 +27,6 @@ jobs:
       run: |
         mkdir pkg
         cp ./ChatterinoUpdater/ChatterinoUpdater/bin/Release/ChatterinoUpdater.exe ./pkg/
-        cp ./ChatterinoUpdater/ChatterinoUpdater/dll/ICSharpCode.SharpZipLib.dll ./pkg/
-        cp ./ChatterinoUpdater/ChatterinoUpdater/dll/LICENSE.txt ./pkg/SharpZipLib_LICENSE.txt
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v6
