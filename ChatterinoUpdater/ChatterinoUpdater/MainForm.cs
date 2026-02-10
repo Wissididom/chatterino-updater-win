@@ -52,17 +52,16 @@ namespace ChatterinoUpdater
                 try
                 {
                     using (var fileStream = File.OpenRead(zipPath))
+                    using (var zipArchive = new ZipArchive(fileStream, ZipArchiveMode.Read))
                     {
-                        var zipFile = new ZipFile(fileStream);
+                        _fileCount = zipArchive.Entries.Count(x => !string.IsNullOrEmpty(x.Name));
 
-                        _fileCount = zipFile.Cast<ZipEntry>().Count(x => x.IsFile);
-
-                        processZipFile(zipFile);
+                        processZipFile(zipArchive);
                     }
 
                     File.Delete(zipPath);
                 }
-                catch (Exception exc)
+                catch
                 {
                     this.Invoke(() =>
                     {
@@ -84,9 +83,9 @@ namespace ChatterinoUpdater
             });
         }
 
-        private void processZipFile(ZipFile file)
+        private void processZipFile(ZipArchive archive)
         {
-            foreach (ZipEntry entry in file)
+            foreach (var entry in archive.Entries)
             {
                 while (true)
                 {
@@ -103,7 +102,7 @@ namespace ChatterinoUpdater
                             labelStatus.Text = $@"Installing file {_currentFile} of {_fileCount}";
                         });
 
-                        processEntry(file, entry);
+                        processEntry(entry);
 
                         break;
                     }
@@ -128,35 +127,33 @@ namespace ChatterinoUpdater
             }
         }
 
-        private void processEntry(ZipFile file, ZipEntry entry)
+        private void processEntry(ZipArchiveEntry entry)
         {
             // skip directories
-            if (!entry.IsFile)
+            if (string.IsNullOrEmpty(entry.Name))
                 return;
 
             // skip if same name as this directory
-            var entryName = entry.Name;
-            entryName = Regex.Replace(entryName, "^Chatterino2/", "");
+            var entryName = Regex.Replace(entry.FullName, "^Chatterino2/", "");
 
             if (entryName.StartsWith(_ownDirectory))
                 return;
 
             // extract the file
-            var stream = file.GetInputStream(entry);
-
             var outPath = Path.Combine("..", entryName);
 
             // create directory if needed
             var directoryName = Path.GetDirectoryName(outPath);
-            if (directoryName.Length > 0)
+            if (!string.IsNullOrEmpty(directoryName))
             {
                 Directory.CreateDirectory(directoryName);
             }
 
             // write the file
-            using (var writer = File.Create(outPath))
+            using (var input = entry.Open())
+            using (var output = File.Create(outPath))
             {
-                StreamUtils.Copy(stream, writer, new byte[4096]);
+                input.CopyTo(output);
             }
 
             _currentFile++;
