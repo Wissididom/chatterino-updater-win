@@ -2,6 +2,9 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+#if !DEBUG
+using System.Threading;
+#endif
 
 namespace ChatterinoUpdater
 {
@@ -50,7 +53,7 @@ namespace ChatterinoUpdater
                 {
                     Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-US");
 
-                    MessageBox.Show("An unexpected error has occured. You might have to redownload the chatterino installer.\n\n" + ex.Message);
+                    Console.WriteLine("An unexpected error has occured. You might have to redownload the chatterino installer.\n\n" + ex.Message);
                 }
                 catch { }
             }
