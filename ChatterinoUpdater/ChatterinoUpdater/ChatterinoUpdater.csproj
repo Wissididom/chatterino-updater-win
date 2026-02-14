@@ -13,5 +13,6 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <UseWindowsForms>True</UseWindowsForms>
     <StartupObject>ChatterinoUpdater.Program</StartupObject>
+	<PublishTrimmed>true</PublishTrimmed>
   </PropertyGroup>
 </Project>
