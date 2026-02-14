@@ -113,4 +113,3 @@
         private System.Windows.Forms.RichTextBox rtbError;
     }
 }
-
